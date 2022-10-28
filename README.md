@@ -20,3 +20,17 @@ Tool(s?) for manipulating recorded fitness files, ala TCX/GPX/etc.
   * a bunch of integration work with various software providers to fetch/submit TCX files, I just want to focus on file manipulation, not complicated auth work
   * 'weird' manipulation of the recordings beyond merging
   * too many formats of input/output files
+
+## TODO v0.1.0 (aka works-for-my-usecase)
+
+  * wait/work on the sequencing fix as listed here: https://github.com/RReverser/serde-xml-rs/pull/187
+  * wait/work on attribute/tag fix, or just move to yaserde! https://github.com/media-io/yaserde
+  * actually figure out how to merge trackpoints
+  * figure out how to selectively drop data streams
+    * position
+    * altitude
+    * distance
+    * cadence
+    * HR
+    * Watts
+  * compare parity with other tools
