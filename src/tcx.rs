@@ -13,7 +13,7 @@ pub struct TrainingCenterDatabase {
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct Activities {
-    #[serde(rename = "Activity")]
+    #[serde(rename = "$value")]
     pub activity: Vec<Activity>
 }
 
@@ -45,7 +45,7 @@ pub struct Lap {
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 struct Track {
-    #[serde(rename = "Trackpoint")]
+    #[serde(rename = "$value")]
     pub trackpoint: Vec<TrackPoint>
 }
 
