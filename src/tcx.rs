@@ -1,39 +1,36 @@
-use std::env;
-use std::fs;
-use std::io::BufReader;
+use std::io;
 use serde::{Deserialize, Serialize};
 use serde_xml_rs::de::{Deserializer};
 use chrono::{DateTime, Utc};
 
-
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
-struct TrainingCenterDatabase {
-    activities: Activities
+pub struct TrainingCenterDatabase {
+    pub activities: Activities
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
-struct Activities {
+pub struct Activities {
     #[serde(rename = "$value")]
-    activities: Vec<Activity>
+    pub list: Vec<Activity>
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
-struct Activity {
+pub struct Activity {
     id: String,
-    lap: Lap,
+    pub lap: Lap,
     sport: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
-struct Lap {
+pub struct Lap {
     start_time: DateTime<Utc>,
     total_time_seconds: f32,
     distance_meters: f32,
     maximum_speed: f32,
-    calories: u32,
+    pub calories: u32,
     average_heart_rate_bpm: Option<HR>,
     maximum_heart_rate_bpm: Option<HR>,
     cadence: u32,
@@ -86,18 +83,12 @@ struct TrackPoint {
     extensions: Option<Extensions>,
 }
 
-
-fn main() {
-    let args: Vec<String> = env::args().collect();
-    let file_path = &args[1];
-
-    let file = fs::File::open(file_path).expect(&format!("Cannot open file {}", file_path));
-    let reader = BufReader::new(file);
-    let deserializer = &mut Deserializer::new_from_reader(reader);
+pub fn read(stream: &mut impl io::Read) -> TrainingCenterDatabase {
+    let deserializer = &mut Deserializer::new_from_reader(stream);
     let result: Result<TrainingCenterDatabase, _> = serde_path_to_error::deserialize(deserializer);
     match result {
-        Ok(_) => {
-            println!("done");
+        Ok(db) => {
+            return db;
         }
         Err(err) => {
             let path = err.path().to_string();

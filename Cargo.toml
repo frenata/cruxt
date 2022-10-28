@@ -11,12 +11,10 @@ serde = { version = "1.0.147", features = ["derive"] }
 serde-xml-rs = "0.6.0"
 serde_path_to_error = "0.1.8"
 
-[[bin]]
-name = "basic"
-test = false
-bench = false
+[lib]
+name = "tcx"
+path = "src/tcx.rs"
 
 [[bin]]
-name = "baseball"
+name = "merge"
 test = false
-bench = false
