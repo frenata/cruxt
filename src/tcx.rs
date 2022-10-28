@@ -1,6 +1,8 @@
 use std::io;
 use serde::{Deserialize, Serialize};
 use serde_xml_rs::de::{Deserializer};
+use serde_xml_rs::ser::{Serializer};
+use serde_xml_rs::{from_reader, to_writer};
 use chrono::{DateTime, Utc};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -11,16 +13,16 @@ pub struct TrainingCenterDatabase {
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct Activities {
-    #[serde(rename = "$value")]
-    pub list: Vec<Activity>
+    #[serde(rename = "Activity")]
+    pub activity: Vec<Activity>
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 pub struct Activity {
-    id: String,
+    pub id: String,
     pub lap: Lap,
-    sport: String,
+    pub sport: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -31,7 +33,9 @@ pub struct Lap {
     distance_meters: f32,
     maximum_speed: f32,
     pub calories: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
     average_heart_rate_bpm: Option<HR>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     maximum_heart_rate_bpm: Option<HR>,
     cadence: u32,
     intensity: String,
@@ -41,8 +45,8 @@ pub struct Lap {
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 struct Track {
-    #[serde(rename = "$value")]
-    points: Vec<TrackPoint>
+    #[serde(rename = "Trackpoint")]
+    pub trackpoint: Vec<TrackPoint>
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -73,17 +77,27 @@ struct HR {
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 struct TrackPoint {
-    time: DateTime<Utc>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    time: Option<DateTime<Utc>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     position: Option<Position>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     altitude_meters: Option<f32>,
-    distance_meters: f32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    distance_meters: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     heart_rate_bpm: Option<HR>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     sensor_state: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     cadence: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     extensions: Option<Extensions>,
 }
 
 pub fn read(stream: &mut impl io::Read) -> TrainingCenterDatabase {
+    //return from_reader(stream).unwrap();
+
     let deserializer = &mut Deserializer::new_from_reader(stream);
     let result: Result<TrainingCenterDatabase, _> = serde_path_to_error::deserialize(deserializer);
     match result {
@@ -93,6 +107,24 @@ pub fn read(stream: &mut impl io::Read) -> TrainingCenterDatabase {
         Err(err) => {
             let path = err.path().to_string();
             panic!("Could not deserialize at: {}", path);
+        }
+    }
+}
+
+pub fn write(buf: &mut impl io::Write, db: &mut TrainingCenterDatabase) {
+    //to_writer(buf, &db).unwrap();
+
+    let serializer = &mut Serializer::new(buf);
+    let mut track = serde_path_to_error::Track::new();
+    let error_serializer = serde_path_to_error::Serializer::new(serializer, &mut track);
+    //let result: Result<TrainingCenterDatabase, _> = serde_path_to_error::serialize(serializer);
+    match db.serialize(error_serializer) {
+        Ok(_) => {
+            println!("wrote to file")
+        }
+        Err(_) => {
+            let path = track.path().to_string();
+            panic!("Could not serialize at: {}", path);
         }
     }
 }

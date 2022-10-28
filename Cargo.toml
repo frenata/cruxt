@@ -7,8 +7,9 @@ edition = "2021"
 
 [dependencies]
 chrono = { version = "0.4.22", features = ["serde"] }
+env_logger = "0.9.1"
 serde = { version = "1.0.147", features = ["derive"] }
-serde-xml-rs = "0.6.0"
+serde-xml-rs = { git = "https://github.com/burleight/serde-xml-rs", branch = "serialize-vec-struct"}
 serde_path_to_error = "0.1.8"
 
 [lib]
