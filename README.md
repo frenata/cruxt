@@ -2,6 +2,8 @@
 
 Tool(s?) for manipulating recorded fitness files, ala TCX/GPX/etc.
 
+At a minimum this should allow a user to specify via a simple UI (web? ssh? cli?) a series of fitness files to be ingested, *how* they should be merged and/or manipulating, and finally produce a single output file for that user.
+
 ## Project Goals
 
   * build good library support for de/serializing TCX files (the existing library in Rust doesn't support serialization and has little traffic)
